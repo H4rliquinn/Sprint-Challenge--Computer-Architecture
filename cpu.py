@@ -26,7 +26,7 @@ class CPU:
         self.bt[0b01010100]=self.JMP
         self.bt[0b01010101]=self.JEQ
         self.bt[0b01010110]=self.JNE
-        # self.bt[0b01010110]=self.ADDI
+        self.bt[0b10000000]=self.ADDI
         self.bt[0b00000001]=self.HLT
 
         self.registers=[0]*8
@@ -75,7 +75,16 @@ class CPU:
         self.ram_read()
         operand_b=self.MDR 
         self.alu('ADD',operand_a,operand_b)
-        
+
+    def ADDI(self):
+        self.MAR=self.PC+1
+        self.ram_read()
+        operand_a=self.MDR 
+        self.MAR=self.PC+2
+        self.ram_read()
+        operand_b=self.MDR 
+        self.registers[operand_a]+=operand_b
+
     def PUSH(self):
         # Get Value to push
         operand_a=self.registers[self.ram[self.PC+1]]
