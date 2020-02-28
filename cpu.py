@@ -27,6 +27,14 @@ class CPU:
         self.bt[0b01010101]=self.JEQ
         self.bt[0b01010110]=self.JNE
         self.bt[0b10000000]=self.ADDI
+
+        self.bt[0b10101000]=self.AND
+        self.bt[0b10101010]=self.OR
+        self.bt[0b10101011]=self.XOR
+        self.bt[0b01101001]=self.NOT
+        self.bt[0b10101100]=self.SHL
+        self.bt[0b10101101]=self.SHR
+        self.bt[0b10100100]=self.MOD
         self.bt[0b00000001]=self.HLT
 
         self.registers=[0]*8
@@ -75,6 +83,68 @@ class CPU:
         self.ram_read()
         operand_b=self.MDR 
         self.alu('ADD',operand_a,operand_b)
+    def AND(self):
+        self.MAR=self.PC+1
+        self.ram_read()
+        operand_a=self.MDR 
+        self.MAR=self.PC+2
+        self.ram_read()
+        operand_b=self.MDR 
+        self.alu('AND',operand_a,operand_b)
+
+    def OR(self):
+        self.MAR=self.PC+1
+        self.ram_read()
+        operand_a=self.MDR 
+        self.MAR=self.PC+2
+        self.ram_read()
+        operand_b=self.MDR 
+        self.alu('OR',operand_a,operand_b)
+
+    def XOR(self):
+        self.MAR=self.PC+1
+        self.ram_read()
+        operand_a=self.MDR 
+        self.MAR=self.PC+2
+        self.ram_read()
+        operand_b=self.MDR 
+        self.alu('XOR',operand_a,operand_b)
+
+    def NOT(self):
+        self.MAR=self.PC+1
+        self.ram_read()
+        operand_a=self.MDR 
+        self.MAR=self.PC+2
+        self.ram_read()
+        operand_b=self.MDR 
+        self.alu('NOT',operand_a,operand_b)
+
+    def SHL(self):
+        self.MAR=self.PC+1
+        self.ram_read()
+        operand_a=self.MDR 
+        self.MAR=self.PC+2
+        self.ram_read()
+        operand_b=self.MDR 
+        self.alu('SHL',operand_a,operand_b)
+
+    def SHR(self):
+        self.MAR=self.PC+1
+        self.ram_read()
+        operand_a=self.MDR 
+        self.MAR=self.PC+2
+        self.ram_read()
+        operand_b=self.MDR 
+        self.alu('SHR',operand_a,operand_b)
+
+    def MOD(self):
+        self.MAR=self.PC+1
+        self.ram_read()
+        operand_a=self.MDR 
+        self.MAR=self.PC+2
+        self.ram_read()
+        operand_b=self.MDR 
+        self.alu('MOD',operand_a,operand_b)
 
     def ADDI(self):
         self.MAR=self.PC+1
@@ -201,7 +271,7 @@ class CPU:
             else:
                 self.FL = self.FL | 0b00000001
             # print("CMP",self.FL,self.registers[reg_a],self.registers[reg_b])
-        elif op=="ADD":
+        elif op=="AND":
             self.registers[reg_a]=self.registers[reg_a] & self.registers[reg_b]
         elif op=="OR":
             self.registers[reg_a]=self.registers[reg_a] | self.registers[reg_b]
@@ -214,7 +284,7 @@ class CPU:
         elif op=="SHR":
             self.registers[reg_a]=self.registers[reg_a]>>self.registers[reg_b]
         else:
-            raise Exception("Unsupported ALU operation")
+            raise Exception(f"Unsupported ALU operation: {op}")
 
     def trace(self):
         """
