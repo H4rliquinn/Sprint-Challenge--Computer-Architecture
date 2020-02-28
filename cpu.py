@@ -26,6 +26,7 @@ class CPU:
         self.bt[0b01010100]=self.JMP
         self.bt[0b01010101]=self.JEQ
         self.bt[0b01010110]=self.JNE
+        # self.bt[0b01010110]=self.ADDI
         self.bt[0b00000001]=self.HLT
 
         self.registers=[0]*8
@@ -235,5 +236,6 @@ class CPU:
             # print("IR",self.IR)
             # print("RAM",self.ram,"REG",self.registers,"FL",self.FL)
             self.bt[self.IR]()
-            if self.IR not in [0b01010000,0b00010001,0b01010100,0b01010101,0b01010110]:
+            set_pc=(self.IR & 0b00010000)>>4
+            if set_pc ==0:
                 self.PC+=(self.IR>>6)+1
