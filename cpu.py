@@ -200,9 +200,9 @@ class CPU:
         elif op=="NOT":
             self.registers[reg_a]=~self.registers[reg_a]
         elif op=="SHL":
-            pass
+            self.registers[reg_a]=self.registers[reg_a]<<self.registers[reg_b]
         elif op=="SHR":
-            pass
+            self.registers[reg_a]=self.registers[reg_a]>>self.registers[reg_b]
         else:
             raise Exception("Unsupported ALU operation")
 
