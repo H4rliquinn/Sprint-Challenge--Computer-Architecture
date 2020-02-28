@@ -11,7 +11,7 @@ class CPU:
         self.MAR=0b00000000  # * `MAR`: Memory Address Register, holds the memory address we're reading or writing
         self.MDR=0b00000000  # * `MDR`: Memory Data Register, holds the value to write or the value just read
         self.IR=0b00000000   # * `IR`: Instruction Register, contains a copy of the currently executing instruction
-        self.FL=0b00000000   # * `FL`: Flags, see below
+        self.FL=0b00000000   # * `FL`: Flag, 0b00000LGE
         self.bt={} #Branch Table
         self.bt[0b00011111]=self.BEEJ
         self.bt[0b10000010]=self.LDI
@@ -104,7 +104,13 @@ class CPU:
         self.registers[self.SP] += 1
 
     def CMP(self):
-        pass
+        self.MAR=self.PC+1
+        self.ram_read()
+        operand_a=self.MDR 
+        self.MAR=self.PC+2
+        self.ram_read()
+        operand_b=self.MDR         
+        self.alu('CMP',operand_a,operand_b)
 
     def JMP(self):
         pass
@@ -158,6 +164,14 @@ class CPU:
             self.registers[reg_a] /= self.registers[reg_b]
         elif op == "MOD":
             self.registers[reg_a] %= self.registers[reg_b]
+        elif op == "CMP":
+            self.FL & 0b00000000
+            if reg_a > reg_b:
+                self.FL = self.FL | 0b00000010
+            elif reg_a < reg_b:
+                self.FL = self.FL | 0b00000100
+            else:
+                self.FL = self.FL | 0b00000001
         else:
             raise Exception("Unsupported ALU operation")
 
@@ -184,6 +198,8 @@ class CPU:
     def run(self):
         """Run the CPU."""
         while True:
+            print(self.ram)
+            print("FL",self.FL)
             self.MAR=self.PC
             self.ram_read()
             self.IR=self.MDR
