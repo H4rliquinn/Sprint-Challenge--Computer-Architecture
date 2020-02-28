@@ -6,7 +6,7 @@ class CPU:
     """Main CPU class."""
     def __init__(self):
         """Construct a new CPU."""
-        self.ram=[0b00000000]*40
+        self.ram=[0b00000000]*100
         self.PC=0b00000000   # * `PC`: Program Counter, address of the currently executing instruction
         self.MAR=0b00000000  # * `MAR`: Memory Address Register, holds the memory address we're reading or writing
         self.MDR=0b00000000  # * `MDR`: Memory Data Register, holds the value to write or the value just read
@@ -37,7 +37,7 @@ class CPU:
         IM=0b00000101   # * R5 is reserved as the interrupt mask (IM)
         IS=0b00000110   # * R6 is reserved as the interrupt status (IS)
         self.SP=0b00000111   # * R7 is reserved as the stack pointer (SP)
-        self.registers[self.SP]=40
+        self.registers[self.SP]=100
 
     def BEEJ(self):
         print("Beej!")
@@ -109,17 +109,35 @@ class CPU:
         operand_a=self.MDR 
         self.MAR=self.PC+2
         self.ram_read()
-        operand_b=self.MDR         
+        operand_b=self.MDR
         self.alu('CMP',operand_a,operand_b)
 
     def JMP(self):
-        pass
+        self.MAR=self.PC+1
+        self.ram_read()
+        operand_a=self.MDR
+        self.PC = self.registers[operand_a]
 
     def JEQ(self):
-        pass
+        self.MAR=self.PC+1
+        self.ram_read()
+        operand_a=self.MDR
+        if self.FL==0b00000001:
+            self.PC = self.registers[operand_a]
+        else:
+            self.PC+=2
 
     def JNE(self):
-        pass
+        self.MAR=self.PC+1
+        self.ram_read()
+        operand_a=self.MDR
+        test=self.FL & 0b00000001
+        # print("TEST",test,self.PC)
+        if test==0b00000000:
+            self.PC = self.registers[operand_a]
+        else:
+            self.PC+=2
+        # print(self.PC)
 
     def HLT(self):
         sys.exit(0)
@@ -165,13 +183,14 @@ class CPU:
         elif op == "MOD":
             self.registers[reg_a] %= self.registers[reg_b]
         elif op == "CMP":
-            self.FL & 0b00000000
-            if reg_a > reg_b:
+            self.FL = self.FL & 0b00000000
+            if self.registers[reg_a] > self.registers[reg_b]:
                 self.FL = self.FL | 0b00000010
-            elif reg_a < reg_b:
+            elif self.registers[reg_a] < self.registers[reg_b]:
                 self.FL = self.FL | 0b00000100
             else:
                 self.FL = self.FL | 0b00000001
+            # print("CMP",self.FL,self.registers[reg_a],self.registers[reg_b])
         else:
             raise Exception("Unsupported ALU operation")
 
@@ -198,11 +217,11 @@ class CPU:
     def run(self):
         """Run the CPU."""
         while True:
-            print(self.ram)
-            print("FL",self.FL)
             self.MAR=self.PC
             self.ram_read()
             self.IR=self.MDR
+            # print("IR",self.IR)
+            # print("RAM",self.ram,"REG",self.registers,"FL",self.FL)
             self.bt[self.IR]()
             if self.IR not in [0b01010000,0b00010001,0b01010100,0b01010101,0b01010110]:
                 self.PC+=(self.IR>>6)+1
