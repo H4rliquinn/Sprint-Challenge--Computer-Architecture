@@ -22,6 +22,10 @@ class CPU:
         self.bt[0b01000110]=self.POP
         self.bt[0b01010000]=self.CALL
         self.bt[0b00010001]=self.RET
+        self.bt[0b10100111]=self.CMP
+        self.bt[0b01010100]=self.JMP
+        self.bt[0b01010101]=self.JEQ
+        self.bt[0b01010110]=self.JNE
         self.bt[0b00000001]=self.HLT
 
         self.registers=[0]*8
@@ -99,6 +103,18 @@ class CPU:
         self.PC=self.ram[self.registers[self.SP]]
         self.registers[self.SP] += 1
 
+    def CMP(self):
+        pass
+
+    def JMP(self):
+        pass
+
+    def JEQ(self):
+        pass
+
+    def JNE(self):
+        pass
+
     def HLT(self):
         sys.exit(0)
 
@@ -172,5 +188,5 @@ class CPU:
             self.ram_read()
             self.IR=self.MDR
             self.bt[self.IR]()
-            if self.IR not in [0b01010000,0b00010001]:
+            if self.IR not in [0b01010000,0b00010001,0b01010100,0b01010101,0b01010110]:
                 self.PC+=(self.IR>>6)+1
