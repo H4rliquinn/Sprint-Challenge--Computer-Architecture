@@ -170,7 +170,7 @@ class CPU:
             print("File Not Found")
             sys.exit(2)
 
-    def alu(self, op, reg_a, reg_b):
+    def alu(self, op, reg_a, reg_b=0b00000000):
         """ALU operations."""
         if op == "ADD":
             self.registers[reg_a] += self.registers[reg_b]
@@ -191,6 +191,18 @@ class CPU:
             else:
                 self.FL = self.FL | 0b00000001
             # print("CMP",self.FL,self.registers[reg_a],self.registers[reg_b])
+        elif op=="ADD":
+            self.registers[reg_a]=self.registers[reg_a] & self.registers[reg_b]
+        elif op=="OR":
+            self.registers[reg_a]=self.registers[reg_a] | self.registers[reg_b]
+        elif op=="XOR":
+            self.registers[reg_a]=self.registers[reg_a] ^ self.registers[reg_b]
+        elif op=="NOT":
+            self.registers[reg_a]=~self.registers[reg_a]
+        elif op=="SHL":
+            pass
+        elif op=="SHR":
+            pass
         else:
             raise Exception("Unsupported ALU operation")
 
